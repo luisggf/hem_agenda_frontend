@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 type AddressData = {
   logradouro: string;
   localidade: string;
   uf: string;
+};
+
+type Estado = {
+  id: number;
+  sigla: string;
+};
+
+type Cidade = {
+  id: number;
+  nome: string;
+  estado_id: number;
 };
 
 async function buscarEnderecoPorCEP(cep: string) {
@@ -17,6 +29,20 @@ async function buscarEnderecoPorCEP(cep: string) {
   } else {
     throw new Error("CEP não encontrado");
   }
+}
+
+async function getEstados() {
+  const response = await fetch(`http://localhost:3333/getAllStates`);
+  return await response.json();
+}
+
+async function getCidades(estadoId: number) {
+  const response = await fetch(`http://localhost:3333/cities`);
+  const allCidades = await response.json();
+  const filteredCidades = allCidades.filter(
+    (cidade: Cidade) => cidade.estado_id === estadoId
+  );
+  return filteredCidades;
 }
 
 export default function SignUpDialog() {
@@ -30,46 +56,115 @@ export default function SignUpDialog() {
     tipo_sanguineo: "",
     cep: "",
     cidade: "",
+    cidade_id: "",
     estado: "",
   });
+
+  const [estados, setEstados] = useState<Estado[]>([]);
+  const [cidades, setCidades] = useState<Cidade[]>([]);
+
+  useEffect(() => {
+    const fetchEstados = async () => {
+      const estados = await getEstados();
+      setEstados(estados);
+    };
+
+    fetchEstados();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleCEPBlur = async () => {
+    if (name === "estado") {
+      // Reset city when state changes
+      setFormData((prev) => ({
+        ...prev,
+        estado: value,
+        cidade_id: "", // Reset city when the state changes
+      }));
+
+      // Fetch cities when state changes
+      const selectedEstado = estados.find((estado) => estado.sigla === value);
+      if (selectedEstado) {
+        fetchCidades(selectedEstado.id);
+      }
+    }
+  };
+  const handleCEPClick = async () => {
     if (formData.cep.length === 8) {
       try {
         const addressData = (await buscarEnderecoPorCEP(
           formData.cep
         )) as AddressData;
-        setFormData((prev) => ({
-          ...prev,
-          rua: addressData.logradouro,
-          cidade: addressData.localidade,
-          estado: addressData.uf,
-        }));
+
+        const selectedEstado = estados.find(
+          (estado) => estado.sigla === addressData.uf
+        );
+        if (selectedEstado) {
+          const cidades = await fetchCidades(selectedEstado.id);
+
+          const selectedCidade = cidades.find(
+            (cidade: Cidade) =>
+              cidade.nome.toLowerCase() === addressData.localidade.toLowerCase()
+          );
+
+          if (selectedCidade) {
+            setFormData((prev) => ({
+              ...prev,
+              rua: addressData.logradouro,
+              estado: addressData.uf,
+              cidade_id: selectedCidade.id, // Correctly set the city ID
+            }));
+          }
+        }
+        toast.success("CEP validado com sucesso!");
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
-        alert("CEP não encontrado. Por favor, verifique e tente novamente.");
+        toast.error(
+          "CEP não encontrado. Por favor, verifique e tente novamente."
+        );
       }
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form data submitted:", formData);
-    // Here you would typically send the data to your backend
+    const response = await fetch("http://localhost:3333/register-person", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nome: formData.nome,
+        rg: formData.rg,
+        rua: formData.rua,
+        numero: formData.numero,
+        complemento: formData.complemento,
+        tipo_sanguineo_id: parseInt(formData.tipo_sanguineo),
+        cidade_id: formData.cidade_id,
+      }),
+    });
+
+    console.log(formData);
+
+    if (response.ok) {
+      toast.success("Poll created successfully!");
+    }
     setIsOpen(false);
+  };
+  const fetchCidades = async (estadoId: number) => {
+    const cidades = await getCidades(estadoId);
+    setCidades(cidades);
+    return cidades;
   };
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Trigger asChild>
-        <Button>Sign Up</Button>
+        <Button className="w-full">Sign Up</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black bg-opacity-50 fixed inset-0" />
@@ -96,24 +191,34 @@ export default function SignUpDialog() {
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
               />
             </div>
-            <div>
-              <label
-                htmlFor="cep"
-                className="block text-sm font-bold text-gray-700 mb-2"
-              >
-                CEP
-              </label>
-              <input
-                type="text"
-                id="cep"
-                name="cep"
-                value={formData.cep}
-                onChange={handleInputChange}
-                onBlur={handleCEPBlur}
-                required
-                className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="cep"
+                  className="block text-sm font-bold text-gray-700 mb-2"
+                >
+                  CEP
+                </label>
+                <input
+                  type="text"
+                  id="cep"
+                  name="cep"
+                  maxLength={8}
+                  value={formData.cep}
+                  onChange={handleInputChange} // Keep onChange to update the state
+                  className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  className="h-1/2 w-full"
+                  onClick={handleCEPClick} // Call the new function on button click
+                >
+                  Validar CEP
+                </Button>
+              </div>
             </div>
+
             <div>
               <label
                 htmlFor="rua"
@@ -200,32 +305,15 @@ export default function SignUpDialog() {
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
               >
                 <option value="">Selecione</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
+                <option value="1">A+</option>
+                <option value="2">A-</option>
+                <option value="3">B+</option>
+                <option value="4">B-</option>
+                <option value="5">AB+</option>
+                <option value="6">AB-</option>
+                <option value="7">O+</option>
+                <option value="8">O-</option>
               </select>
-            </div>
-            <div>
-              <label
-                htmlFor="cidade"
-                className="block text-sm font-bold text-gray-700 mb-2"
-              >
-                Cidade
-              </label>
-              <input
-                type="text"
-                id="cidade"
-                name="cidade"
-                value={formData.cidade}
-                onChange={handleInputChange}
-                required
-                className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
-              />
             </div>
             <div>
               <label
@@ -234,15 +322,57 @@ export default function SignUpDialog() {
               >
                 Estado
               </label>
-              <input
-                type="text"
+              <select
                 id="estado"
                 name="estado"
                 value={formData.estado}
                 onChange={handleInputChange}
                 required
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
-              />
+              >
+                <option value="">Selecione um Estado</option>
+                {estados.map((estado) => (
+                  <option key={estado.id} value={estado.sigla}>
+                    {estado.sigla}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Cidade Select */}
+            <div>
+              <label
+                htmlFor="cidade"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
+                Cidade
+              </label>
+              <select
+                id="cidade"
+                name="cidade"
+                value={formData.cidade_id}
+                onChange={(e) => {
+                  const selectedCityId = e.target.value;
+                  const selectedCity = cidades.find(
+                    (cidade) => cidade.id === parseInt(selectedCityId)
+                  );
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    cidade_id: selectedCityId,
+                    cidade: selectedCity ? selectedCity.nome : "", // Update both cidade and cidade_id
+                  }));
+                }}
+                required
+                className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
+              >
+                <option value="">Selecione uma Cidade</option>
+                {cidades.map((cidade) => (
+                  <option key={cidade.id} value={cidade.id}>
+                    {cidade.nome}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="flex justify-end">
               <button
