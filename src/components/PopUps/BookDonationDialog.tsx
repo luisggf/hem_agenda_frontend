@@ -147,7 +147,7 @@ export default function BookDonation({ localId }: { localId: number }) {
           ) : (
             <DonationConfirmation
               donorName={selectedPerson?.nome || ""}
-              bloodType=""
+              bloodType={selectedPerson?.tipo_id || 0}
               donationDate={donationDate}
               donationLocationId={localId}
             />
