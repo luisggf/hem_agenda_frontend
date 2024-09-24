@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import SignUpDialog from "./PopUps/SignUpDialog";
+import SignUpDialog from "./popups/SignUpDialog";
 import { Button } from "./ui/button";
 import { Calendar, Heart, Clock, MapPin } from "lucide-react";
+import BloodDonationDialog from "./popups/BookDonationDialog";
 
 // Update interface to match the API structure
 interface LocaisColeta {
@@ -108,7 +109,9 @@ export default function Home() {
                         {location.cidade_id}
                       </span>
                     </div>
-                    <Button className="mt-auto">Book Slot</Button>
+                    <BloodDonationDialog
+                      localId={location.id}
+                    ></BloodDonationDialog>
                   </div>
                 ))
               ) : (

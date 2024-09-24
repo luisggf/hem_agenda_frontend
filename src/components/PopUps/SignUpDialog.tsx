@@ -151,7 +151,7 @@ export default function SignUpDialog() {
     console.log(formData);
 
     if (response.ok) {
-      toast.success("Poll created successfully!");
+      toast.success("Register created successfully!");
     }
     setIsOpen(false);
   };
@@ -211,7 +211,7 @@ export default function SignUpDialog() {
               </div>
               <div className="flex items-end">
                 <Button
-                  className="h-1/2 w-full"
+                  className="h-7 w-full"
                   onClick={handleCEPClick} // Call the new function on button click
                 >
                   Validar CEP
@@ -377,7 +377,7 @@ export default function SignUpDialog() {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-4 py-2 w-full text-sm font-medium text-white bg-black rounded-md hover:bg-black/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                className="px-8 py-4 mt-2 w-full text-sm font-medium text-white bg-black rounded-md hover:bg-black/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
               >
                 Sign Up
               </button>
