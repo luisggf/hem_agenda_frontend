@@ -51,11 +51,11 @@ export default function BookDonation({ localId }: { localId: number }) {
     }
   }, [nameQuery, persons]);
 
-  const handleSelectPerson = (person: Person) => {
+  const handleSelectPerson = async (person: Person) => {
     setSelectedPerson(person);
-    setNameQuery(person.nome);
-    setRg(person.rg);
+    setNameQuery("");
     setFilteredPersons([]);
+    setShowConfirmation(false);
   };
 
   const handleSubmit = async () => {
