@@ -3,6 +3,7 @@ import SignUpDialog from "./popups/SignUpDialog";
 import { Button } from "./ui/button";
 import { Calendar, Heart, Clock, MapPin } from "lucide-react";
 import BloodDonationDialog from "./popups/BookDonationDialog";
+import HamburgerMenu from "./Menu/HamburguerMainMenu";
 
 // Update interface to match the API structure
 interface LocaisColeta {
@@ -42,9 +43,10 @@ export default function Home() {
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <p className="flex items-center justify-center">
           <Heart className="h-6 w-6 text-red-500" />
-          <span className="ml-2 text-lg font-bold">BloodDonate</span>
+          <span className="ml-2 text-lg font-bold">Hem Agenda</span>
         </p>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <HamburgerMenu></HamburgerMenu>
+        {/* <nav className="ml-auto flex gap-4 sm:gap-6">
           <p className="text-sm font-medium hover:underline underline-offset-4">
             Home
           </p>
@@ -57,7 +59,7 @@ export default function Home() {
           <p className="text-sm font-medium hover:underline underline-offset-4">
             Contact
           </p>
-        </nav>
+        </nav> */}
       </header>
       <main className="flex-1 flex flex-col items-center">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-red-50 flex justify-center">
