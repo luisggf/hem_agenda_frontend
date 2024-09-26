@@ -27,7 +27,7 @@ export default function HamburgerMenu() {
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black bg-opacity-50" />
         <Dialog.Content className="fixed top-0 right-0 bottom-0 z-50 w-1/5 bg-white shadow-lg focus:outline-none">
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between h-16 bg-red-600 px-4">
+            <div className="flex items-center justify-between h-16 bg-red-500 px-4">
               <Heart className="h-6 w-6 text-white" />
               <span className="text-white text-xl font-semibold">
                 Hem Agenda

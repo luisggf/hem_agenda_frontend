@@ -67,7 +67,10 @@ export default function Home() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Save Lives, Donate Blood
+                  <span className="text-red-500 flex flex-col text-8xl font-extrabold">
+                    Save Lives
+                  </span>{" "}
+                  Donate Blood Today
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                   Your donation can save up to three lives. Join our community
@@ -122,7 +125,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-red-50 flex justify-center">
+        <section className="w-full p-52 bg-red-50 flex justify-center">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">

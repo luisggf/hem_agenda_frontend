@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import * as Dialog from "@radix-ui/react-dialog";
 import axios from "axios";
 import DonationConfirmation from "../cards/BloodDonationConfirmationCard";
+import { toast } from "sonner"; // Assuming you're using sonner for toast notifications
 
 interface Person {
   id: number;
@@ -24,6 +25,9 @@ export default function BookDonation({ localId }: { localId: number }) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [donationDate, setDonationDate] = useState("");
 
+  // Ref to track if the user has selected a person to close the suggestions
+  const hasSelectedPersonRef = useRef(false);
+
   useEffect(() => {
     async function fetchPersons() {
       try {
@@ -35,44 +39,85 @@ export default function BookDonation({ localId }: { localId: number }) {
         }
       } catch (error) {
         console.error("Error fetching persons:", error);
+        toast.error("Failed to fetch persons. Please try again.");
       }
     }
     fetchPersons();
   }, []);
 
   useEffect(() => {
-    if (Array.isArray(persons)) {
+    if (!hasSelectedPersonRef.current && nameQuery.trim() !== "") {
       const filtered = persons.filter((person) =>
         person.nome.toLowerCase().includes(nameQuery.toLowerCase())
       );
       setFilteredPersons(filtered.slice(0, 3));
-    } else {
-      console.error("Persons data is not an array:", persons);
+
+      // Auto-fill RG if the name matches exactly one person
+      const matchedPerson = filtered.find(
+        (person) => person.nome.toLowerCase() === nameQuery.toLowerCase()
+      );
+      if (matchedPerson) {
+        setRg(matchedPerson.rg);
+        setSelectedPerson(matchedPerson); // Auto-select the matched person
+      } else {
+        setRg(""); // Clear RG if no exact match is found
+        setSelectedPerson(null); // Reset selected person if no match is found
+      }
     }
   }, [nameQuery, persons]);
 
-  const handleSelectPerson = async (person: Person) => {
+  const handleSelectPerson = (person: Person) => {
     setSelectedPerson(person);
-    setNameQuery("");
-    setFilteredPersons([]);
-    setShowConfirmation(false);
+    setNameQuery(person.nome);
+    setRg(person.rg);
+    setFilteredPersons([]); // Clear the filtered list to ensure suggestions disappear
+    hasSelectedPersonRef.current = true; // Set the ref to indicate a person has been selected
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNameQuery(value);
+    setSelectedPerson(null); // Clear the selected person when the user types a new query
+    setRg(""); // Reset the RG field when a new name is typed
+    hasSelectedPersonRef.current = false; // Reset the ref when the user types again
   };
 
   const handleSubmit = async () => {
-    if (selectedPerson) {
-      try {
-        await axios.post("http://localhost:3333/register-donation", {
-          pessoa_id: selectedPerson.id,
-          local_id: localId,
-        });
-        setDonationDate(new Date().toISOString());
-        setShowConfirmation(true);
-      } catch (error) {
-        console.error("Error registering donation:", error);
-        alert("Failed to register donation. Please try again.");
-      }
-    } else {
-      alert("Please select a person from the list.");
+    // Check if the name typed matches a valid person
+    const matchedPerson = persons.find(
+      (person) => person.nome.toLowerCase() === nameQuery.toLowerCase()
+    );
+
+    if (!matchedPerson) {
+      // Trigger an error message if no valid person is selected
+      toast.error(
+        "Name not found. Please select a valid person from the list."
+      );
+      return;
+    }
+
+    // Validate if RG is correct
+    if (rg !== matchedPerson.rg) {
+      toast.error("Invalid RG for the selected person.");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:3333/register-donation", {
+        pessoa_id: matchedPerson.id,
+        local_id: localId,
+      });
+      setDonationDate(new Date().toISOString());
+      setShowConfirmation(true);
+    } catch (error) {
+      console.error("Error registering donation:", error);
+      toast.error("Failed to register donation. Please try again.");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSubmit();
     }
   };
 
@@ -103,7 +148,8 @@ export default function BookDonation({ localId }: { localId: number }) {
                   type="text"
                   id="nome"
                   value={nameQuery}
-                  onChange={(e) => setNameQuery(e.target.value)}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown} // Handle Enter key press
                   placeholder="Enter your name"
                   className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500"
                 />
@@ -137,6 +183,7 @@ export default function BookDonation({ localId }: { localId: number }) {
                   onChange={(e) => setRg(e.target.value)}
                   placeholder="Enter your RG"
                   className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500"
+                  onKeyDown={handleKeyDown} // Also allow RG submission via Enter key
                 />
               </div>
 
