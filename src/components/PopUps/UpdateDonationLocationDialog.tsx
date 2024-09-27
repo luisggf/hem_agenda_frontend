@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
@@ -109,14 +110,12 @@ export default function UpdateDonationLocationDialog({
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "estado") {
-      // Reset city when state changes
       setFormData((prev) => ({
         ...prev,
         estado: value,
-        cidade_id: "", // Reset city when the state changes
+        cidade_id: "",
       }));
 
-      // Fetch cities when state changes
       const selectedEstado = estados.find((estado) => estado.sigla === value);
       if (selectedEstado) {
         fetchCidades(selectedEstado.id);
@@ -146,7 +145,7 @@ export default function UpdateDonationLocationDialog({
               ...prev,
               rua: addressData.logradouro,
               estado: addressData.uf,
-              cidade_id: selectedCidade.id, // Correctly set the city ID
+              cidade_id: selectedCidade.id,
             }));
           }
         }
@@ -232,15 +231,12 @@ export default function UpdateDonationLocationDialog({
                   name="cep"
                   maxLength={8}
                   value={formData.cep}
-                  onChange={handleInputChange} // Keep onChange to update the state
+                  onChange={handleInputChange}
                   className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
                 />
               </div>
               <div className="flex items-end">
-                <Button
-                  className="h-7 w-full"
-                  onClick={handleCEPClick} // Call the new function on button click
-                >
+                <Button className="h-7 w-full" onClick={handleCEPClick}>
                   Validar CEP
                 </Button>
               </div>
@@ -306,7 +302,6 @@ export default function UpdateDonationLocationDialog({
               </select>
             </div>
 
-            {/* Cidade Select */}
             <div>
               <label
                 htmlFor="cidade"
@@ -327,7 +322,7 @@ export default function UpdateDonationLocationDialog({
                   setFormData((prev) => ({
                     ...prev,
                     cidade_id: selectedCityId,
-                    cidade: selectedCity ? selectedCity.nome : "", // Update both cidade and cidade_id
+                    cidade: selectedCity ? selectedCity.nome : "",
                   }));
                 }}
                 required
@@ -346,7 +341,7 @@ export default function UpdateDonationLocationDialog({
                 type="submit"
                 className="px-8 py-4 mt-2 w-full text-sm font-medium text-white bg-black rounded-md hover:bg-black/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
               >
-                Register Location
+                Confirm Update
               </button>
             </div>
           </form>

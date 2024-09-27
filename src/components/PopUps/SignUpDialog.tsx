@@ -79,14 +79,12 @@ export default function SignUpDialog() {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "estado") {
-      // Reset city when state changes
       setFormData((prev) => ({
         ...prev,
         estado: value,
-        cidade_id: "", // Reset city when the state changes
+        cidade_id: "",
       }));
 
-      // Fetch cities when state changes
       const selectedEstado = estados.find((estado) => estado.sigla === value);
       if (selectedEstado) {
         fetchCidades(selectedEstado.id);
@@ -205,15 +203,12 @@ export default function SignUpDialog() {
                   name="cep"
                   maxLength={8}
                   value={formData.cep}
-                  onChange={handleInputChange} // Keep onChange to update the state
+                  onChange={handleInputChange}
                   className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-50 focus:ring focus:ring-red-50"
                 />
               </div>
               <div className="flex items-end">
-                <Button
-                  className="h-7 w-full"
-                  onClick={handleCEPClick} // Call the new function on button click
-                >
+                <Button className="h-7 w-full" onClick={handleCEPClick}>
                   Validar CEP
                 </Button>
               </div>
@@ -339,7 +334,6 @@ export default function SignUpDialog() {
               </select>
             </div>
 
-            {/* Cidade Select */}
             <div>
               <label
                 htmlFor="cidade"
@@ -360,7 +354,7 @@ export default function SignUpDialog() {
                   setFormData((prev) => ({
                     ...prev,
                     cidade_id: selectedCityId,
-                    cidade: selectedCity ? selectedCity.nome : "", // Update both cidade and cidade_id
+                    cidade: selectedCity ? selectedCity.nome : "",
                   }));
                 }}
                 required

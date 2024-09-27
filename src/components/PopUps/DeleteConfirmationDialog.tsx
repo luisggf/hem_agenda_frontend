@@ -23,7 +23,7 @@ export default function ConfirmationPopup({
   const handleDelete = async (id: number) => {
     {
       try {
-        await axios.delete(`http://localhost:3333/donation-local/${id}`);
+        await axios.delete(`http://localhost:3333/delete-donation-local/${id}`);
         toast.success("Donation location deleted successfully!"); // Success toast
       } catch (error) {
         console.error("Error deleting donation local:", error);
@@ -76,7 +76,7 @@ export default function ConfirmationPopup({
                 </Dialog.Close>
                 <button
                   onClick={() => handleDelete(location.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 transition duration-150 ease-in-out"
+                  className="px-4 py-2 bg-black text-white rounded-md hover:bg-red-500 transition duration-150 ease-in-out"
                 >
                   Delete
                 </button>

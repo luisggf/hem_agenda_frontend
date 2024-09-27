@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import SignUpDialog from "./popups/SignUpDialog";
-import { Calendar, Heart, Clock, MapPin } from "lucide-react";
+import {
+  Calendar,
+  Heart,
+  Clock,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import BloodDonationDialog from "./popups/BookDonationDialog";
 import HamburgerMenu from "./Menu/HamburguerMainMenu";
 
@@ -14,7 +21,7 @@ interface LocaisColeta {
   complemento?: string;
   created_at: string;
   updated_at: string;
-  cidade_id: number; // Use cidade_id directly
+  cidade_id: number;
 }
 
 interface City {
@@ -26,7 +33,9 @@ export default function Home() {
   const [donationLocations, setDonationLocations] = useState<LocaisColeta[]>(
     []
   );
-  const [cityNames, setCityNames] = useState<{ [key: number]: string }>({}); // Store city names
+  const [cityNames, setCityNames] = useState<{ [key: number]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 6;
 
   // Fetch data from API
   useEffect(() => {
@@ -34,7 +43,6 @@ export default function Home() {
       try {
         const response = await fetch("http://localhost:3333/getDonationsLocal");
         const data = await response.json();
-
         setDonationLocations(data);
       } catch (error) {
         console.error("Error fetching donation locations:", error);
@@ -44,7 +52,6 @@ export default function Home() {
     fetchAllLocations();
   }, []);
 
-  // Fetch the city name based on the cidade_id
   const fetchCityName = async (cidadeId: number) => {
     if (!cityNames[cidadeId]) {
       try {
@@ -52,7 +59,7 @@ export default function Home() {
         const cityData: City = await response.json();
         setCityNames((prevState) => ({
           ...prevState,
-          [cidadeId]: cityData.nome, // Add the city name to the state
+          [cidadeId]: cityData.nome,
         }));
       } catch (error) {
         console.error(`Error fetching city name for ID: ${cidadeId}`, error);
@@ -61,9 +68,15 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Fetch city names for all locations
     donationLocations.forEach((location) => fetchCityName(location.cidade_id));
   }, [donationLocations]);
+
+  const totalPages = Math.ceil(donationLocations.length / cardsPerPage);
+  const startIndex = (currentPage - 1) * cardsPerPage;
+  const currentCards = donationLocations.slice(
+    startIndex,
+    startIndex + cardsPerPage
+  );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -101,40 +114,68 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
               Upcoming Donation Events
             </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {donationLocations.length > 0 ? (
-                donationLocations.map((location) => (
-                  <div
-                    key={location.id}
-                    className="flex flex-col p-6 bg-white rounded-lg shadow-lg hover:scale-105 hover:shadow-md hover:shadow-red-300"
-                  >
-                    <div className="flex items-center mb-4 text-red-500">
-                      <Calendar className="w-5 h-5 mr-2" />
-                      <span className="font-semibold">
-                        {new Date(location.updated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{location.nome}</h3>
-                    <div className="flex items-center mb-2 text-gray-600">
-                      <Clock className="w-4 h-4 mr-2" />
-                      <span>9:00 AM - 5:00 PM</span>
-                    </div>
-                    <div className="flex items-center mb-4 text-gray-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      <span>
-                        {location.rua}, {location.numero},{" "}
-                        {/* Display city name if fetched */}
-                        {cityNames[location.cidade_id] || "Loading..."}
-                      </span>
-                    </div>
-                    <BloodDonationDialog
-                      localId={location.id}
-                    ></BloodDonationDialog>
-                  </div>
-                ))
-              ) : (
-                <p>No upcoming donation events available.</p>
-              )}
+            <div className="relative h-[350px] mt-8">
+              <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none bg-gradient-to-t from-gray-50 to-transparent z-100"></div>
+
+              <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-red-300 hover:scrollbar-thumb-red-500 transition-colors duration-200 px-6">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pb-16">
+                  {currentCards.length > 0 ? (
+                    currentCards.map((location) => (
+                      <div
+                        key={location.id}
+                        className="flex flex-col p-6 bg-white rounded-lg shadow-lg hover:scale-105 hover:shadow-md hover:shadow-red-300 transition-all duration-300"
+                      >
+                        <div className="flex items-center mb-4 text-red-500">
+                          <Calendar className="w-5 h-5 mr-2" />
+                          <span className="font-semibold">
+                            {new Date(location.updated_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">
+                          {location.nome}
+                        </h3>
+                        <div className="flex items-center mb-2 text-gray-600">
+                          <Clock className="w-4 h-4 mr-2" />
+                          <span>9:00 AM - 5:00 PM</span>
+                        </div>
+                        <div className="flex items-center mb-4 text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2" />
+                          <span>
+                            {location.rua}, {location.numero},{" "}
+                            {cityNames[location.cidade_id] || "Loading..."}
+                          </span>
+                        </div>
+                        <BloodDonationDialog
+                          localId={location.id}
+                        ></BloodDonationDialog>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No upcoming donation events available.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center items-center space-x-2 mt-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <ChevronLeft />
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <ChevronRight />
+              </button>
             </div>
           </div>
         </section>

@@ -136,11 +136,11 @@ export default function BookDonation({ localId }: { localId: number }) {
             Please provide your details to confirm your donation.{" "}
           </Dialog.Description>
           {!showConfirmation ? (
-            <div className="space-y-4">
-              <div className="mb-4">
+            <div className="space-y-4  outline-none">
+              <div className="mb-4  outline-none">
                 <label
                   htmlFor="nome"
-                  className="block text-sm font-bold text-gray-700 mb-2"
+                  className="block text-sm font-bold text-gray-700 mb-2  outline-none"
                 >
                   Nome
                 </label>
@@ -151,7 +151,7 @@ export default function BookDonation({ localId }: { localId: number }) {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown} // Handle Enter key press
                   placeholder="Enter your name"
-                  className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500"
+                  className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-200  outline-none focus:ring focus:ring-red-50"
                 />
 
                 {nameQuery && filteredPersons.length > 0 && (
@@ -182,7 +182,7 @@ export default function BookDonation({ localId }: { localId: number }) {
                   value={rg}
                   onChange={(e) => setRg(e.target.value)}
                   placeholder="Enter your RG"
-                  className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500"
+                  className="mt-1 block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-red-200  outline-none focus:ring focus:ring-red-50"
                   onKeyDown={handleKeyDown} // Also allow RG submission via Enter key
                 />
               </div>

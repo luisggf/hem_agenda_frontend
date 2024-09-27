@@ -34,7 +34,7 @@ export default function MaintenanceDonationLocal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "name">("date");
   const [currentPage, setCurrentPage] = useState(1);
-  const localsPerPage = 12;
+  const localsPerPage = 6;
 
   useEffect(() => {
     fetchDonationLocals();
@@ -78,17 +78,15 @@ export default function MaintenanceDonationLocal() {
   };
 
   const handleSearch = () => {
-    let result = donationLocals;
+    let result = [...donationLocals];
 
-    // Filter by search query
     if (searchQuery) {
       result = result.filter((local) =>
         local.nome.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Sorting logic
-    result = result.sort((a, b) => {
+    result.sort((a, b) => {
       if (sortBy === "date") {
         return (
           new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
@@ -100,6 +98,9 @@ export default function MaintenanceDonationLocal() {
 
     setFilteredLocals(result);
   };
+  useEffect(() => {
+    handleSearch();
+  }, [sortBy, donationLocals]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -158,7 +159,7 @@ export default function MaintenanceDonationLocal() {
         </section>
 
         <section className="py-4">
-          <div className="container space-y-4 mx-auto px-4">
+          <div className="container space-y-4 mx-auto px-4 pb-36">
             <div className="w-full md:w-1/4 p-4 flex flex-col sm:flex-row gap-4">
               <select
                 value={sortBy}
@@ -169,39 +170,52 @@ export default function MaintenanceDonationLocal() {
                 <option value="name">Sort by Name</option>
               </select>
             </div>
+            <div className="relative h-[350px] mt-8">
+              <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none bg-gradient-to-t from-gray-50 to-transparent z-100"></div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols- gap-6">
-              {currentLocals.map((location) => (
-                <div
-                  key={location.id}
-                  className="flex flex-col p-6 bg-white rounded-lg shadow-lg hover:scale-105 hover:shadow-md hover:shadow-red-300"
-                >
-                  <div className="flex items-center mb-4 text-red-500">
-                    <Calendar className="w-5 h-5 mr-2" />
-                    <span className="font-semibold">
-                      {new Date(location.updated_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{location.nome}</h3>
-                  <div className="flex items-center mb-2 text-gray-600">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>9:00 AM - 5:00 PM</span>
-                  </div>
-                  <div className="flex items-center mb-4 text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>
-                      {location.rua}, {location.numero},{" "}
-                      {cityNames[location.cidade_id] || "Loading city..."}
-                    </span>
-                  </div>
-                  <div className="flex space-x-1">
-                    <UpdateDonationLocationDialog
-                      location={location}
-                    ></UpdateDonationLocationDialog>
-                    <ConfirmationPopup location={location}></ConfirmationPopup>
-                  </div>
+              <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-red-300 hover:scrollbar-thumb-red-500 transition-colors duration-200 px-6">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pb-16">
+                  {currentLocals.length > 0 ? (
+                    currentLocals.map((location) => (
+                      <div
+                        key={location.id}
+                        className="flex flex-col p-6 bg-white rounded-lg shadow-lg hover:scale-105 hover:shadow-md hover:shadow-red-300 transition-all duration-300"
+                      >
+                        <div className="flex items-center mb-4 text-red-500">
+                          <Calendar className="w-5 h-5 mr-2" />
+                          <span className="font-semibold">
+                            {new Date(location.updated_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">
+                          {location.nome}
+                        </h3>
+                        <div className="flex items-center mb-2 text-gray-600">
+                          <Clock className="w-4 h-4 mr-2" />
+                          <span>9:00 AM - 5:00 PM</span>
+                        </div>
+                        <div className="flex items-center mb-4 text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2" />
+                          <span>
+                            {location.rua}, {location.numero},{" "}
+                            {cityNames[location.cidade_id] || "Loading..."}
+                          </span>
+                        </div>
+                        <div className="flex space-x-1">
+                          <UpdateDonationLocationDialog
+                            location={location}
+                          ></UpdateDonationLocationDialog>
+                          <ConfirmationPopup
+                            location={location}
+                          ></ConfirmationPopup>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No upcoming donation events available.</p>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
 
             <div className="flex justify-center items-center space-x-2">

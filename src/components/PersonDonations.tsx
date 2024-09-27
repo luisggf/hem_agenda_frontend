@@ -75,9 +75,9 @@ export default function CheckPersonsDonations() {
 
   const handleSelectPerson = async (person: Person) => {
     setSelectedPerson(person);
-    setNameQuery(""); // Clear the query to close the suggestion list
-    setFilteredPersons([]); // Clear the filtered list to ensure suggestions disappear
-    setIsLoading(true); // Set loading to true during data fetching
+    setNameQuery("");
+    setFilteredPersons([]);
+    setIsLoading(true);
 
     try {
       const response = await axios.get(
@@ -88,7 +88,7 @@ export default function CheckPersonsDonations() {
     } catch (error) {
       console.error("Error fetching person details:", error);
     } finally {
-      setIsLoading(false); // Set loading to false after fetching
+      setIsLoading(false);
     }
   };
 
@@ -98,7 +98,7 @@ export default function CheckPersonsDonations() {
       return;
     }
     if (filteredPersons.length > 0) {
-      handleSelectPerson(filteredPersons[0]); // Select the first person if found
+      handleSelectPerson(filteredPersons[0]);
     } else {
       toast.error("No person found with this name");
     }
@@ -123,7 +123,7 @@ export default function CheckPersonsDonations() {
       <main className="flex-1 flex flex-col items-center">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-red-50">
           <div className="container px-4 md:px-6 mx-auto">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-center mb-6">
+            <h1 className="text-4xl font-bold tracking-tighter sm:text-6xl md:text-6xl lg:text-7xl/none text-center mb-6">
               Check Person's Donations
             </h1>
             <div className="max-w-md mx-auto">
@@ -159,7 +159,7 @@ export default function CheckPersonsDonations() {
                 </ul>
               )}
               <button
-                className=" bg-black text-white hover:bg-black/80 p-2 w-1/2 mt-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                className=" bg-black w-full text-white hover:bg-black/80 p-2  mt-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                 onClick={handleSearch}
               >
                 Search

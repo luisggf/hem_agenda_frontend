@@ -16,7 +16,7 @@ export default function HamburgerMenu() {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black bg-opacity-50" />
-        <Dialog.Content className="fixed top-0 right-0 bottom-0 z-50 w-1/5 bg-white shadow-lg focus:outline-none">
+        <Dialog.Content className="fixed top-0 right-0 bottom-0 z-50 w-1/5 bg-white shadow-lg outline-none">
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between h-16 bg-black px-4">
               <Heart className="h-5 w-5 text-red-300" />
@@ -25,7 +25,7 @@ export default function HamburgerMenu() {
               </span>
               <Dialog.Close asChild>
                 <button
-                  className="text-red-300 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500"
+                  className="text-red-300 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 outline-none"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
