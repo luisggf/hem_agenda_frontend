@@ -1,13 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Menu,
-  X,
-  Home,
-  Calendar,
-  PlusCircle,
-  Droplet,
-  Heart,
-} from "lucide-react";
+import { Menu, X, Home, PlusCircle, Droplet, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import RegisterDonationLocal from "../popups/RegisterDonationLocalDialog";
 
@@ -51,15 +43,7 @@ export default function HamburgerMenu() {
                     <span className="ml-3">Home</span>
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/schedule"
-                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-red-100 rounded-md transition-colors duration-200"
-                  >
-                    <Calendar className="w-5 h-5" />
-                    <span className="ml-3">Schedule</span>
-                  </Link>
-                </li>
+
                 <li>
                   <div className="flex items-center px-4 py-3 text-gray-700 hover:bg-red-100 rounded-md transition-colors duration-200">
                     <PlusCircle className="w-5 h-5" />

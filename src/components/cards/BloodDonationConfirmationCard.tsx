@@ -129,7 +129,7 @@ const DonationConfirmation: React.FC<DonationConfirmationProps> = ({
   return (
     <div
       ref={componentRef}
-      className="w-full max-w-md mx-auto bg-gradient-to-br from-red-50 to-red-100 shadow-lg rounded-2xl overflow-hidden"
+      className="w-full max-w-md mx-auto bg-gradient-to-br from-red-50 to-red-100 rounded-2xl overflow-hidden"
     >
       <div className="bg-red-500 text-white text-center p-6">
         <h2 className="text-3xl font-bold">Blood Donation Confirmation</h2>
