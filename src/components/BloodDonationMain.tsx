@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import SignUpDialog from "./popups/SignUpDialog";
-import { Button } from "./ui/button";
 import { Calendar, Heart, Clock, MapPin } from "lucide-react";
 import BloodDonationDialog from "./popups/BookDonationDialog";
 import HamburgerMenu from "./Menu/HamburguerMainMenu";
@@ -17,10 +17,16 @@ interface LocaisColeta {
   cidade_id: number; // Use cidade_id directly
 }
 
+interface City {
+  id: number;
+  nome: string;
+}
+
 export default function Home() {
   const [donationLocations, setDonationLocations] = useState<LocaisColeta[]>(
     []
   );
+  const [cityNames, setCityNames] = useState<{ [key: number]: string }>({}); // Store city names
 
   // Fetch data from API
   useEffect(() => {
@@ -30,13 +36,34 @@ export default function Home() {
         const data = await response.json();
 
         setDonationLocations(data);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching donation locations:", error);
       }
     };
+
     fetchAllLocations();
   }, []);
+
+  // Fetch the city name based on the cidade_id
+  const fetchCityName = async (cidadeId: number) => {
+    if (!cityNames[cidadeId]) {
+      try {
+        const response = await fetch(`http://localhost:3333/city/${cidadeId}`);
+        const cityData: City = await response.json();
+        setCityNames((prevState) => ({
+          ...prevState,
+          [cidadeId]: cityData.nome, // Add the city name to the state
+        }));
+      } catch (error) {
+        console.error(`Error fetching city name for ID: ${cidadeId}`, error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Fetch city names for all locations
+    donationLocations.forEach((location) => fetchCityName(location.cidade_id));
+  }, [donationLocations]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -46,20 +73,6 @@ export default function Home() {
           <span className="ml-2 text-lg font-bold">Hem Agenda</span>
         </p>
         <HamburgerMenu></HamburgerMenu>
-        {/* <nav className="ml-auto flex gap-4 sm:gap-6">
-          <p className="text-sm font-medium hover:underline underline-offset-4">
-            Home
-          </p>
-          <p className="text-sm font-medium hover:underline underline-offset-4">
-            Schedule
-          </p>
-          <p className="text-sm font-medium hover:underline underline-offset-4">
-            About
-          </p>
-          <p className="text-sm font-medium hover:underline underline-offset-4">
-            Contact
-          </p>
-        </nav> */}
       </header>
       <main className="flex-1 flex flex-col items-center">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-red-50 flex justify-center">
@@ -77,9 +90,8 @@ export default function Home() {
                   of heroes and make a difference today.
                 </p>
               </div>
-              <div className="space-x-4">
-                <Button>Schedule Donation</Button>
-                <Button variant="outline">Learn More</Button>
+              <div className="space-x-4 w-1/4">
+                <SignUpDialog></SignUpDialog>
               </div>
             </div>
           </div>
@@ -94,7 +106,7 @@ export default function Home() {
                 donationLocations.map((location) => (
                   <div
                     key={location.id}
-                    className="flex flex-col p-6 bg-white rounded-lg shadow-lg"
+                    className="flex flex-col p-6 bg-white rounded-lg shadow-lg hover:scale-105 hover:shadow-md hover:shadow-red-300"
                   >
                     <div className="flex items-center mb-4 text-red-500">
                       <Calendar className="w-5 h-5 mr-2" />
@@ -110,8 +122,9 @@ export default function Home() {
                     <div className="flex items-center mb-4 text-gray-600">
                       <MapPin className="w-4 h-4 mr-2" />
                       <span>
-                        {location.rua}, {location.numero}, Cidade ID:{" "}
-                        {location.cidade_id}
+                        {location.rua}, {location.numero},{" "}
+                        {/* Display city name if fetched */}
+                        {cityNames[location.cidade_id] || "Loading..."}
                       </span>
                     </div>
                     <BloodDonationDialog

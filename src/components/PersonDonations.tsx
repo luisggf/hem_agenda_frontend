@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Loader, Heart, Calendar, MapPin } from "lucide-react";
-import DonationConfirmation from "../cards/BloodDonationConfirmationCard";
-import HamburgerMenu from "../Menu/HamburguerMainMenu";
+import DonationConfirmation from "./cards/BloodDonationConfirmationCard";
+import HamburgerMenu from "./Menu/HamburguerMainMenu";
 import { toast } from "sonner"; // Importing Button and toast from Sonner
 
 interface Person {
@@ -106,7 +106,7 @@ export default function CheckPersonsDonations() {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleSearch(); // Trigger search on Enter key press
+      handleSearch();
     }
   };
 
@@ -139,7 +139,7 @@ export default function CheckPersonsDonations() {
                   id="nome"
                   value={nameQuery}
                   onChange={(e) => setNameQuery(e.target.value)}
-                  onKeyDown={handleKeyPress} // Add key press event handler
+                  onKeyDown={handleKeyPress}
                   placeholder="Enter name to search"
                   className="w-full px-4 py-2 rounded-md border-2 border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50"
                 />

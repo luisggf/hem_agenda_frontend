@@ -124,7 +124,7 @@ export default function BookDonation({ localId }: { localId: number }) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button className="w-full">Book Slot</Button>
+        <Button className="w-full">Register Donation</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black bg-opacity-50 fixed inset-0" />

@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/BloodDonationMain";
-import CheckPersonsDonations from "./components/popups/PersonDonations";
+import CheckPersonsDonations from "./components/PersonDonations";
+import MaintenanceDonationLocal from "./components/MaintenanceDonationLocal";
 
 function App() {
   return (
@@ -11,6 +12,10 @@ function App() {
           <Route
             path="/search-persons-donation"
             element={<CheckPersonsDonations />}
+          />
+          <Route
+            path="/maintenance-donation-local"
+            element={<MaintenanceDonationLocal />}
           />
         </Routes>
       </BrowserRouter>
